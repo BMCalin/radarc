@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RadArc</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="backdrop">
+    <div id="glow"></div>
+    <div id="shadow"></div>
+  </div>
+  <canvas id="scene"></canvas>
+  <div id="labels"></div>
+
+  <header id="brand" class="glass">
+    <div class="brand-row">
+      <span class="logo" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="18" height="18"><circle cx="12" cy="12" r="9.2" fill="none" stroke="currentColor" stroke-width="1.4"/><ellipse cx="12" cy="12" rx="4.2" ry="9.2" fill="none" stroke="currentColor" stroke-width="1.1"/><path d="M3 12h18" stroke="currentColor" stroke-width="1.1"/></svg>
+      </span>
+      <div>
+        <div class="title">RadArc</div>
+        <div class="sub"><span id="status-dot" class="dot"></span><span id="status-text">connecting…</span></div>
+      </div>
+    </div>
+    <div class="home-row" id="home-row" title="Your location, from your public IP">
+      <span class="home-pin"></span><span id="home-text">—</span>
+    </div>
+  </header>
+
+  <section id="stats">
+    <div class="stat in"><span class="num" id="n-in">0</span><span class="lbl"><i></i>inbound</span></div>
+    <div class="stat out"><span class="num" id="n-out">0</span><span class="lbl"><i></i>outbound</span></div>
+    <div class="stat"><span class="num" id="n-cc">0</span><span class="lbl">countries</span></div>
+    <div class="stat"><span class="num" id="n-proc">0</span><span class="lbl">processes</span></div>
+  </section>
+
+  <aside id="panel" class="glass">
+    <div class="panel-head">
+      <div class="seg" role="tablist">
+        <button data-f="all" class="on">All</button>
+        <button data-f="in"><i class="sw in"></i>Inbound</button>
+        <button data-f="out"><i class="sw out"></i>Outbound</button>
+      </div>
+      <button id="collapse" class="icon-btn" title="Collapse">
+        <svg viewBox="0 0 24 24" width="16" height="16"><path d="M6 15l6-6 6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+    <div class="panel-tools">
+      <input id="search" type="search" placeholder="Search process, IP, city…" autocomplete="off">
+      <label class="chk"><input type="checkbox" id="show-lan"> LAN</label>
+    </div>
+    <div id="list"></div>
+    <div id="list-foot"></div>
+  </aside>
+
+  <nav id="controls" class="glass">
+    <button id="btn-home" class="ctl" title="Center on my location">
+      <svg viewBox="0 0 24 24" width="17" height="17"><circle cx="12" cy="12" r="3" fill="currentColor"/><circle cx="12" cy="12" r="7.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M12 1.5v3M12 19.5v3M1.5 12h3M19.5 12h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    </button>
+    <button id="btn-rotate" class="ctl on" title="Auto-rotate">
+      <svg viewBox="0 0 24 24" width="17" height="17"><path d="M20 12a8 8 0 1 1-2.6-5.9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M20 4v4.5h-4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <button id="btn-pause" class="ctl" title="Freeze updates">
+      <svg viewBox="0 0 24 24" width="17" height="17"><rect x="6.5" y="5" width="3.6" height="14" rx="1" fill="currentColor"/><rect x="13.9" y="5" width="3.6" height="14" rx="1" fill="currentColor"/></svg>
+    </button>
+  </nav>
+
+  <div id="credit">IP geolocation: <a href="https://db-ip.com" target="_blank" rel="noopener">DB-IP</a> · relief: Natural Earth / NASA</div>
+  <div id="tip" class="glass" hidden></div>
+  <div id="loading">loading globe…</div>
+
+  <script type="importmap">
+  { "imports": { "three": "./lib/three.module.js" } }
+  </script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

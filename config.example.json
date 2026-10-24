@@ -1,0 +1,12 @@
+{
+  "port": 8765,
+  "interval": 1.0,
+  "online_geo": false,
+  "home": {
+    "lat": 38.7223,
+    "lon": -9.1393,
+    "city": "Lisbon",
+    "country": "Portugal",
+    "cc": "PT"
+  }
+}
