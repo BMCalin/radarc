@@ -42,14 +42,15 @@ scene.add(world);
 
 /* ---------------- globe ---------------- */
 const loader = new THREE.TextureLoader();
+const glowUniform = { value: params.has('glow') ? parseFloat(params.get('glow')) || 0 : 1 };
 const loadTex = (url) => new Promise((res, rej) => loader.load(url, res, undefined, rej));
 
 async function buildGlobe() {
-  const [hTex, nTex, aoTex] = await Promise.all([
-    loadTex('tex/height.png'), loadTex('tex/normal.jpg'), loadTex('tex/ao.png'),
+  const [hTex, nTex, aoTex, gTex] = await Promise.all([
+    loadTex('tex/height.png'), loadTex('tex/normal.jpg'), loadTex('tex/ao.png'), loadTex('tex/glow.png'),
   ]);
   const aniso = renderer.capabilities.getMaxAnisotropy();
-  for (const t of [hTex, nTex, aoTex]) {
+  for (const t of [hTex, nTex, aoTex, gTex]) {
     t.colorSpace = THREE.NoColorSpace;
     t.anisotropy = aniso;
     t.wrapS = THREE.RepeatWrapping;
@@ -66,12 +67,16 @@ async function buildGlobe() {
     aoMap: aoTex,
     aoMapIntensity: 0.9,
   });
-  // translucent lavender edge (fresnel)
+  // translucent lavender edge (fresnel) + glow under the land, seen from the light side
   mat.onBeforeCompile = (sh) => {
     sh.uniforms.uRim = { value: new THREE.Color('#9aa6ff') };
     sh.uniforms.uRimW = { value: new THREE.Color('#eef0ff') };
+    sh.uniforms.uGlowMap = { value: gTex };
+    sh.uniforms.uGlowCol = { value: new THREE.Color('#6f80ff') };
+    sh.uniforms.uGlowDir = { value: new THREE.Vector3(0.85, -0.3, 0.42).normalize() };
+    sh.uniforms.uGlowStr = glowUniform;
     sh.fragmentShader = sh.fragmentShader
-      .replace('#include <common>', '#include <common>\nuniform vec3 uRim; uniform vec3 uRimW;')
+      .replace('#include <common>', '#include <common>\nuniform vec3 uRim; uniform vec3 uRimW; uniform sampler2D uGlowMap; uniform vec3 uGlowCol; uniform vec3 uGlowDir; uniform float uGlowStr;')
       .replace('#include <opaque_fragment>', `
         vec3 Vd = normalize(vViewPosition);
         float ndv = clamp(dot(normal, Vd), 0.0, 1.0);
@@ -80,6 +85,12 @@ async function buildGlobe() {
         vec3 rimCol = mix(uRimW, uRim, side);
         outgoingLight = mix(outgoingLight, rimCol * 1.02, fr * 0.6 * (0.35 + 0.65 * side));
         outgoingLight += uRim * pow(1.0 - ndv, 6.0) * 0.35 * side;
+        // glow: light leaking from under the continents onto the sea, only on the side facing uGlowDir
+        float gm = texture2D(uGlowMap, vNormalMapUv).r;
+        float gSide = smoothstep(-0.45, 0.75, dot(normalize(vNormal), uGlowDir));
+        float gk = gm * gSide * (0.8 + 1.4 * fr) * uGlowStr;
+        outgoingLight = mix(outgoingLight, uGlowCol, clamp(gk * 1.25, 0.0, 0.88));
+        outgoingLight += uGlowCol * gk * gk * 0.35;
         #include <opaque_fragment>`);
   };
   const globe = new THREE.Mesh(geo, mat);

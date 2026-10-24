@@ -54,7 +54,7 @@ python server.py --port 8765 --interval 1.0 --online --no-browser
 
 If the GeoIP download fails, get **IP to City Lite (MMDB)** from [db-ip.com](https://db-ip.com/db/download/ip-to-city-lite) and put the `.mmdb` file in `data/`. MaxMind's `GeoLite2-City.mmdb` works too.
 
-Open <http://127.0.0.1:8765/?demo> to see simulated data.
+Open <http://127.0.0.1:8765/?demo> to see simulated data. Add `?glow=0` to turn off the glow under the continents, or e.g. `?glow=1.5` to make it stronger.
 
 ## Controls
 
